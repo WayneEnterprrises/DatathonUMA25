@@ -2,13 +2,29 @@
 
 ## Instalación
 
-1. Os bajais el repositorio
-2. Ejecutais `npm install`
-3. Por último ejecutais `npm run dev` y listo, accedeis a la URL y ya teneis la app desplegada en local.
+1. Nos bajamos el repositorio
+2. Creamos una variable de entorno con python de la siguiente forma:
+
+```bash
+$ python3 -m venv .myenv
+$ source .myenv/bin/activate
+```
+
+3. Instalamos las librerias necesarias con el siguiente comando:
+
+```bash
+$ pip install streamlit transformers pillow torch openai
+```
+
+4. Ejecutamos el comando para desplegar la aplicación en local de la siguinte forma:
+
+```bash
+$ python3 -m streamlit run ./Sobre_Nosotros.py
+```
 
 ## To-do list
 
-- [ ] Backend en python + base de datos (SQL Alchemy (?))
-- [ ] Desarrollo componente Chat
-- [ ] Desarrollo componente Informes
-- [ ] Desarrollo componente Pacientes
+- [ ] Arreglar fallos simples de flujo de ejecución (MVC model)
+- [ ] Iniciar desarrollo de pipelines entre LLMs
+- [ ] Investigar sobre generación de gráficas y contenido no textual para mayor riqueza en las respuestas
+- [ ] Base de datos con los chats (usuarios y autenticación ???)
