@@ -89,7 +89,7 @@ if not st.session_state["authenticated"]:
             else:
                 st.error("❌ El usuario ya existe. Prueba con otro nombre.")
 
-    st.stop()  # Bloquear la carga de la página hasta que inicie sesión
+    st.stop()
 
 
 st.title("Presentación del Equipo")

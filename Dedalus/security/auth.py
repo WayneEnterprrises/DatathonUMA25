@@ -14,7 +14,7 @@ def register_user(username, password):
     """Registra un usuario en la base de datos SQLite."""
     db = next(get_db())
     if db.query(User).filter(User.username == username).first():
-        return False  # Usuario ya existe
+        return False  
     new_user = User(username=username, password=password)
     db.add(new_user)
     db.commit()
