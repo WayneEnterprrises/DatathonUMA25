@@ -2,18 +2,17 @@ import streamlit as st
 import time
 from security.auth import register_user, authenticate_user
 
-st.set_page_config(page_title="Bienvenido a ArkhamMed", page_icon=":bat:", layout="centered")
+def login_form():
+    if "authenticated" not in st.session_state:
+        st.session_state["authenticated"] = False
 
-if "authenticated" not in st.session_state:
-    st.session_state["authenticated"] = False
+    if "username" not in st.session_state:
+        st.session_state["username"] = "Usuario Anónimo"
 
-if "username" not in st.session_state:
-    st.session_state["username"] = "Usuario Anónimo"
-
-if "login_mode" not in st.session_state:
-    st.session_state["login_mode"] = None
-
-st.markdown(
+    if "login_mode" not in st.session_state:
+        st.session_state["login_mode"] = None
+        
+    st.markdown(
     """
     <style>
         body {
@@ -37,12 +36,10 @@ st.markdown(
     </style>
     """,
     unsafe_allow_html=True
-)
-
-if not st.session_state["authenticated"]:
+    )
 
     st.title("🦇ArkhamMed - LLM Médico🦇")
-    
+        
     col1, col2 = st.columns([1, 1])
 
     with col1:
@@ -68,6 +65,7 @@ if not st.session_state["authenticated"]:
                 st.error("Usuario o contraseña incorrectos.")
             time.sleep(2)
             st.rerun()
+            st.navigation("pages/Sobre_Nosotros.py")
 
     elif st.session_state["login_mode"] == "register":
         st.subheader("📝 Registrarse")
@@ -85,45 +83,3 @@ if not st.session_state["authenticated"]:
                 st.success("✅ Registro exitoso. Ahora puedes iniciar sesión.")
             else:
                 st.error("❌ El usuario ya existe. Prueba con otro nombre.")
-else:
-    st.title("Presentación del Equipo")
-    st.write(f"Bienvenido {st.session_state['username']} al equipo ArkhamMed de la Universidad de Málaga")
-
-    st.image("assets/logoDatathon.png", caption="Arkham Analytics", use_container_width=True)
-
-    st.markdown("<h2 style='text-align: center; font-weight: bold;'>Conócenos</h2>", unsafe_allow_html=True)
-
-    equipo = [
-        {
-            "nombre": "Ángel Nicolás Escaño López",
-            "github": "https://github.com/JustBeWell",
-            "linkedin": "https://www.linkedin.com/in/angel-nicolas-escaño-lopez-32031426b/",
-        },
-        {
-            "nombre": "José Canto Peral",
-            "github": "https://github.com/Anon2148",
-            "linkedin": "https://www.linkedin.com/in/jose-c-ln/",
-        },
-        {
-            "nombre": "Diego Sicre Cortizo",
-            "github": "https://github.com/DiegoSicre",
-            "linkedin": "https://www.linkedin.com/in/diego-sicre-cortizo-b1897b233/",
-        }
-    ]
-
-    for miembro in equipo:
-        st.markdown(
-            f"""
-            <h2 style="text-align: center;">{miembro['nombre']}</h2>
-            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-                <a href="{miembro['github']}" target="_blank">
-                    <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" width="40" style="margin-right: 10px;">
-                </a>
-                <a href="{miembro['linkedin']}" target="_blank">
-                    <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="40" style="margin-left: 10px;">
-                </a>
-            </div>
-            <hr>
-            """,
-            unsafe_allow_html=True
-        )
