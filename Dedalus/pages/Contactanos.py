@@ -2,24 +2,21 @@ import streamlit as st
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from security.auth import check_authentication
 
 st.set_page_config(page_title="Contactanos", page_icon=":bat:")
-
+check_authentication()
 st.title("📩 Ayuda")
 st.write("Escríbenos para cualquier duda.")
 
-# Campo para el correo electrónico
 email = st.text_input("Tu correo electrónico:", placeholder="ejemplo@email.com")
 
-# Área de texto para escribir la consulta
 mensaje = st.text_area("Tu mensaje:", placeholder="Escribe aquí tu consulta...")
 
-# Configuración del servidor SMTP
-REMITENTE = "byanicoyt@gmail.com"  # Reemplaza con tu correo
-PASSWORD = "qfdq caso mfab rgki"  # Reemplaza con la contraseña de aplicación de Gmail
-DESTINATARIO_ADMIN = "byanicoyt@gmail.com"  # Donde quieres recibir los mensajes
+REMITENTE = "byanicoyt@gmail.com" 
+PASSWORD = "qfdq caso mfab rgki"  
+DESTINATARIO_ADMIN = "byanicoyt@gmail.com" 
 
-# Función para enviar correo
 def enviar_correo(destinatario, asunto, cuerpo):
     msg = MIMEMultipart()
     msg["From"] = REMITENTE
@@ -38,20 +35,16 @@ def enviar_correo(destinatario, asunto, cuerpo):
         st.error(f"❌ No se pudo enviar el correo: {str(e)}")
         return False
 
-# Botón de enviar con validación
 if st.button("Enviar mensaje"):
     if email and mensaje:
-        # Enviar confirmación al usuario
         asunto_usuario = "Gracias por su consulta"
         cuerpo_usuario = "Hemos recibido correctamente su mensaje, le atenderemos a la mayor brevedad posible 😊. \n \nAtentamente,  ArkhamMed."
         exito_usuario = enviar_correo(email, asunto_usuario, cuerpo_usuario)
 
-        # Enviar el mensaje de ayuda al administrador
         asunto_admin = f"Consulta de {email}"
         cuerpo_admin = f"📩 Nueva consulta de {email}:\n\n{mensaje}"
         exito_admin = enviar_correo(DESTINATARIO_ADMIN, asunto_admin, cuerpo_admin)
 
-        # Mostrar mensaje en pantalla
         if exito_usuario and exito_admin:
             st.success("✅ Tu mensaje ha sido enviado correctamente.")
         else:

@@ -1,5 +1,5 @@
 from PIL import Image, ExifTags
-from .config import vision_model  # Importar el modelo de visión
+from .config import vision_model  
 
 def process_image(image_file):
     """Procesa y analiza una imagen"""
