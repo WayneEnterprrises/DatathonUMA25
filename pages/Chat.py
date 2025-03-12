@@ -1,8 +1,10 @@
 import streamlit as st
 from core.image_processing import process_image
 from core.chatbot import process_chat_message
+from security.auth import check_authentication
 
 st.set_page_config(page_title="ArkhamMed LLM", page_icon=":bat:")
+check_authentication()
 
 st.title("LLM Médico")
 
