@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from DB.database import SessionLocal, User
+from DB.database import SessionLocal, User, Chat
 import streamlit as st
 
 def get_db():
@@ -14,7 +14,7 @@ def register_user(username, password):
     """Registra un usuario en la base de datos SQLite."""
     db = next(get_db())
     if db.query(User).filter(User.username == username).first():
-        return False
+        return False  # Usuario ya existe
     new_user = User(username=username, password=password)
     db.add(new_user)
     db.commit()
@@ -32,5 +32,14 @@ def check_authentication():
         st.error("🔒 Debes iniciar sesión para acceder a esta página.")
         st.stop()
 
-    if "username" not in st.session_state:
-        st.session_state["username"] = "Usuario Anónimo"
+def save_chat_message(username, role, message):
+    """Guarda un mensaje en la base de datos."""
+    db = next(get_db())
+    new_message = Chat(username=username, role=role, message=message)
+    db.add(new_message)
+    db.commit()
+
+def load_chat_history(username):
+    """Carga el historial de chat del usuario."""
+    db = next(get_db())
+    return db.query(Chat).filter(Chat.username == username).all()
