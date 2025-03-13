@@ -1,18 +1,19 @@
 import streamlit as st
-from security.auth import check_authentication
-from pages.login import login_form
+from pages.Login import login_form
 
-st.set_page_config(page_title="Sobre Nosotros", page_icon=":bat:", layout="centered")
+st.set_page_config(page_title="Bienvenido a ArkhamMed", page_icon=":bat:", layout="centered", initial_sidebar_state="collapsed")
 
 if "authenticated" not in st.session_state or st.session_state.authenticated == False:
     login_form()
+
 else:
-    st.title("Presentación del Equipo")
-    st.write(f"Bienvenido {st.session_state['username']} al equipo ArkhamMed de la Universidad de Málaga")
+    st.markdown("<h2 style='text-align: center; font-weight: bold;'>Presentación del equipo</h2>", unsafe_allow_html=True)
+    
+    st.write(f"Bienvenido {st.session_state['username']} al equipo ArkhamMed de la Universidad de Málaga. En este espacio, combinamos la innovación en inteligencia artificial con la excelencia en el ámbito médico para ofrecer soluciones avanzadas en asistencia clínica. Como parte de nuestro equipo, te sumerges en un entorno donde la tecnología de vanguardia y el conocimiento médico se fusionan para transformar la atención al paciente. Prepárate para una experiencia inmersiva en la que cada interacción es un paso más hacia el futuro de la salud digital.")
 
-    st.image("assets/logoDatathon.png", caption="Arkham Analytics", use_container_width=True)
+    st.image("assets/logoDatathon.png", caption="Arkham Analytics",use_container_width=True)
 
-    st.markdown("<h2 style='text-align: center; font-weight: bold;'>Sobre nosotros</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; font-weight: bold;'>Conócenos</h2>", unsafe_allow_html=True)
 
     equipo = [
         {

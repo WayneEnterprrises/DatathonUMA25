@@ -1,5 +1,5 @@
 from PIL import Image, ExifTags
-from .config import vision_model  # Importar el modelo de visión
+from .config import vision_model  
 
 def process_image(image_file):
     """Procesa y analiza una imagen"""
@@ -24,7 +24,7 @@ def process_image(image_file):
                     metadata += f"{tag_name}: {value}\n"
         except AttributeError:
             metadata = "No se encontraron metadatos EXIF."
-        #Este es el modelo de visión que se importa de config.py
+
         result = vision_model(image)
         description = result[0]['generated_text']
 
