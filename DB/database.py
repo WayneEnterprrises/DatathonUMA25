@@ -86,7 +86,7 @@ def import_csvs_to_db():
 
         except Exception as e:
             print(f"❌ Error importando {table_name}: {e}")
-
+            
     db.commit()
     db.close()
 
@@ -122,3 +122,4 @@ if not os.path.exists(DB_FILE):
 
 # Crear la sesión de SQLAlchemy
 SessionLocal = sessionmaker(bind=engine)
+
