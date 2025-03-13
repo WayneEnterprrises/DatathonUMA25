@@ -5,17 +5,17 @@ from security.auth import check_authentication
 from DB.db import get_patients, add_patient, save_chat_message, load_chat_history
 import time
 
-st.set_page_config(page_title="ArkhamMed Chat", page_icon=":bat:")
+st.set_page_config(page_title="Welcome to Bruce!!", page_icon=":bat:")
 
 # 🚀 Asegurar que solo los usuarios autenticados puedan acceder
 check_authentication()
 
 username = st.session_state["username"]
 
-st.title("LLM Médico")
+st.title("Presentamos a Bruce!!")
 
 # 📌 Seleccionar Paciente o Agregar Nuevo
-st.markdown("### Seleccionar Paciente")
+st.markdown("### Selecciona un paciente")
 
 patients = get_patients(username)
 patient_names = [p.name for p in patients]
@@ -44,17 +44,17 @@ else:
     idioma = st.selectbox("Selecciona el idioma", ["Español", "Inglés", "Francés"])
 
     # 📂 Adjuntar archivos
-    st.markdown("### Adjuntar Archivos")
+    st.markdown("### Adjunta archivos a Bruce")
     archivos = st.file_uploader("Seleccionar archivos para adjuntar", accept_multiple_files=True)
 
     # 📌 Mostrar el historial de conversación
-    st.markdown("### Historial de conversación")
+    st.markdown("### Preguntale a Bruce lo que necesites saber")
     for mensaje in st.session_state.chat_history:
         with st.chat_message(mensaje["role"]):
             st.markdown(mensaje["content"])
 
     # 📌 Entrada del usuario
-    prompt = st.chat_input("Escribe tu mensaje...")
+    prompt = st.chat_input("Pregunta a Bruce sobre algo que necesites saber de tus pacientes")
 
     if prompt:
         save_chat_message(selected_patient.id, "user", prompt)

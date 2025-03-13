@@ -78,6 +78,9 @@ def process_chat_message(prompt, idioma, file_context, additional_csv_path=None,
     📊 **Datos estructurados de los CSVs médicos**:
     {csv_json}
 
+    Busca informacion a parte de la que encuentras en estos csv para poder responder correctamente a las preguntas que se te impone, puedes cumplimentar tus observaciones
+    con tablas estadisticas sobre las enfermedades comentadas o informacion sobre los tratamientos actuales.
+
     **Pregunta del usuario**:
     {prompt}
     """
