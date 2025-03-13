@@ -70,7 +70,7 @@ else:
             st.markdown(prompt)
 
         st.session_state["chat_history"].append({"role": "user", "content": prompt})
-
+        print(st.session_state.chat_history)
         file_context = ""
         if archivos:
             with st.spinner('🔍 Analizando archivos...'):

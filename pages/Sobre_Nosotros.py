@@ -1,6 +1,6 @@
 import streamlit as st
 from security.auth import check_authentication
-from pages.login import login_form
+from pages.Login import login_form
 
 st.set_page_config(page_title="Sobre Nosotros", page_icon=":bat:", layout="centered")
 

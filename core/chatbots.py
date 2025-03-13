@@ -50,7 +50,6 @@ def load_all_csvs():
     return csv_data
 
 def process_chat_message(prompt, idioma, file_context, additional_csv_path=None, conver_history=[], max_history=100):
-    print(conver_history)
     """Procesa el mensaje del usuario y genera respuesta del LLM, incluyendo los 6 CSVs automáticamente."""
     
     # Cargar automáticamente los 6 CSVs fijos
