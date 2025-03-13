@@ -69,7 +69,7 @@ def process_chat_message(prompt, idioma, file_context, additional_csv_path=None,
     preprompt = f"""Traduce la respuesta al idioma seleccionado: {idioma}.
     Solo da la respuesta en el idioma que te he pedido.
     Eres un médico profesional, quiero que respondas con un vocabulario técnico
-    y añadas información relevante a la consulta.
+    y añadas información relevante a la consulta, añade enlaces de interes sobre las enfermedades que se traten en la conversacion.
     
 
     📄 **Contexto de archivos adjuntos**:
