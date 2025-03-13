@@ -32,12 +32,19 @@ if selected_patient_name == "➕ Agregar Nuevo Paciente":
 else:
     selected_patient = next(p for p in patients if p.name == selected_patient_name)
 
-    # 📌 Cargar historial de conversación del paciente seleccionado
+     # 📌 Evitar duplicación del historial
     if "chat_history" not in st.session_state or st.session_state["selected_patient"] != selected_patient.id:
-        st.session_state["chat_history"] = []
+        st.session_state["chat_history"] = []  # Resetear historial antes de cargar nuevos mensajes
         chat_history = load_chat_history(selected_patient.id)
+        
+        # Evitar agregar mensajes repetidos
+        unique_messages = set()
         for chat in chat_history:
-            st.session_state["chat_history"].append({"role": chat.role, "content": chat.message})
+            msg_tuple = (chat.role, chat.message)  # Convertir en tupla para evitar duplicados
+            if msg_tuple not in unique_messages:
+                st.session_state["chat_history"].append({"role": chat.role, "content": chat.message})
+                unique_messages.add(msg_tuple)
+        
         st.session_state["selected_patient"] = selected_patient.id
 
     # 📌 Selector de idioma
@@ -75,7 +82,6 @@ else:
             # 📌 Pasar el historial del chat como contexto al modelo
             response_stream = process_chat_message(prompt,idioma, file_context,None,st.session_state.chat_history)
             full_response = ""
-
             # 🔄 Desparticionar el mensaje y mostrarlo en tiempo real
             for chunk in response_stream:
                 full_response += chunk
