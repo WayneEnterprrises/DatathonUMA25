@@ -2,17 +2,13 @@ from sqlalchemy import create_engine, Column, String, Integer, ForeignKey, Text
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 import os
 import pandas as pd
-# Definir la base de datos SQLite
 
-#Deberíamos cambiar el nombre de la base de datos
 # Definir la base de datos SQLite
 DB_FILE = "BruceLLM.db"
 engine = create_engine(f"sqlite:///{DB_FILE}", connect_args={"check_same_thread": False})
 Base = declarative_base()
 SessionLocal = sessionmaker(bind=engine)
 
-# Definir el modelo de base de datos
-Base = declarative_base()
 
 
 class ResumenEvolucion(Base):
@@ -79,47 +75,33 @@ def import_csvs_to_db():
         try:
             # Cargar el CSV en un DataFrame
             df = pd.read_csv(file_path, delimiter=",", on_bad_lines="skip", encoding="utf-8")
-            print(df)
-            # Guardar en la base de datos (reemplaza la tabla si ya existe)
-            df.to_sql(table_name, engine, if_exists="replace", index=False)
+    
+            df.to_sql(table_name, 
+                engine,
+                if_exists="replace",
+                index=False,
+                dtype={'id': Integer()}
+            )
             print(f"✅ {table_name} importado correctamente.")
-
+            db.close()
         except Exception as e:
             print(f"❌ Error importando {table_name}: {e}")
-            
-    db.commit()
-    db.close()
 
-import_csvs_to_db()
+#import_csvs_to_db()
 
 class User(Base):
     __tablename__ = "users"
-    username = Column(String, primary_key=True)
-    password = Column(String, nullable=False)
-    patients = relationship("Patient", back_populates="user", cascade="all, delete-orphan")
-
-class Patient(Base):
-    __tablename__ = "patients"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
-    username = Column(String, ForeignKey("users.username"), nullable=False)
-
-    user = relationship("User", back_populates="patients")
-    chats = relationship("Chat", back_populates="patient", cascade="all, delete-orphan")
+    username = Column(String, nullable=False)
+    password = Column(String, nullable=False)
 
 class Chat(Base):
     __tablename__ = "chats"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    patient_id = Column(Integer, ForeignKey("patients.id"), nullable=False)
+    patient_id = Column(Integer, ForeignKey("resumen_pacientes.PacienteID"), nullable=False)
     role = Column(String, nullable=False)  # "user" o "assistant"
     message = Column(Text, nullable=False)
-
-    patient = relationship("Patient", back_populates="chats")
 
 # Crear la base de datos si no existe
 if not os.path.exists(DB_FILE):
     Base.metadata.create_all(engine)
-
-# Crear la sesión de SQLAlchemy
-SessionLocal = sessionmaker(bind=engine)
-

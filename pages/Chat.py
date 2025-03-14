@@ -2,7 +2,7 @@ import streamlit as st
 from core.image_processing import process_image
 from core.chatbots import process_chat_message
 from security.auth import check_authentication
-from DB.db import get_patients, add_patient, save_chat_message, load_chat_history
+from DB.db import get_all_patients, load_chat_history, save_chat_message
 import time
 
 st.set_page_config(page_title="Welcome to Bruce!!", page_icon=":bat:")
@@ -17,26 +17,19 @@ st.title("Presentamos a Bruce!!")
 # 📌 Seleccionar Paciente o Agregar Nuevo
 st.markdown("### Selecciona un paciente")
 
-patients = get_patients(username)
-patient_names = [p.name for p in patients]
-patient_names.append("➕ Agregar Nuevo Paciente")  # Opción para agregar paciente
+patients = get_all_patients()
+patient_names = [p.Nombre for p in patients]
 
-selected_patient_name = st.selectbox("Selecciona un paciente", patient_names)
+selected_patient_name = st.selectbox(label="Selecciona un paciente", label_visibility="hidden", options=patient_names, index=None, placeholder="Selecciona un paciente disponible")
 
-if selected_patient_name == "➕ Agregar Nuevo Paciente":
-    new_patient_name = st.text_input("Nombre del nuevo paciente")
-    if st.button("Guardar Paciente"):
-        if new_patient_name:
-            add_patient(username, new_patient_name)
-            st.rerun()  # Recargar la página para reflejar cambios
-else:
-    selected_patient = next(p for p in patients if p.name == selected_patient_name)
+if selected_patient_name != None:
+    selected_patient = next(p for p in patients if p.Nombre == selected_patient_name)
 
-     # 📌 Evitar duplicación del historial
-    if "chat_history" not in st.session_state or st.session_state["selected_patient"] != selected_patient.id:
+    # 📌 Evitar duplicación del historial
+    if "selected_patient" not in st.session_state or st.session_state["selected_patient"] != selected_patient.PacienteID:
         st.session_state["chat_history"] = []  # Resetear historial antes de cargar nuevos mensajes
-        chat_history = load_chat_history(selected_patient.id)
-        
+        chat_history = load_chat_history(selected_patient.PacienteID)
+            
         # Evitar agregar mensajes repetidos
         unique_messages = set()
         for chat in chat_history:
@@ -44,8 +37,8 @@ else:
             if msg_tuple not in unique_messages:
                 st.session_state["chat_history"].append({"role": chat.role, "content": chat.message})
                 unique_messages.add(msg_tuple)
-        
-        st.session_state["selected_patient"] = selected_patient.id
+            
+        st.session_state["selected_patient"] = selected_patient.PacienteID
 
     # 📌 Selector de idioma
     idioma = st.selectbox("Selecciona el idioma", ["Español", "Inglés", "Francés"])
@@ -64,7 +57,7 @@ else:
     prompt = st.chat_input("Pregunta a Bruce sobre algo que necesites saber de tus pacientes")
 
     if prompt:
-        save_chat_message(selected_patient.id, "user", prompt)
+        save_chat_message(selected_patient.PacienteID, "user", prompt)
 
         with st.chat_message("user"):
             st.markdown(prompt)
@@ -80,7 +73,7 @@ else:
             response_container = st.empty()
 
             # 📌 Pasar el historial del chat como contexto al modelo
-            response_stream = process_chat_message(prompt,idioma, file_context,None,st.session_state.chat_history)
+            response_stream = process_chat_message(prompt,idioma, file_context, st.session_state.chat_history, selected_patient)
             full_response = ""
             # 🔄 Desparticionar el mensaje y mostrarlo en tiempo real
             for chunk in response_stream:
@@ -90,6 +83,6 @@ else:
 
             response_container.markdown(full_response)
 
-        save_chat_message(selected_patient.id, "assistant", full_response)
+        save_chat_message(selected_patient.PacienteID, "assistant", full_response)
 
         st.session_state["chat_history"].append({"role": "assistant", "content": full_response})

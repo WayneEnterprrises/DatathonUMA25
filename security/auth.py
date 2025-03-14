@@ -1,12 +1,11 @@
-from sqlalchemy.orm import Session
-from DB.database import SessionLocal, User, Patient, Chat
+from DB.db import User, Session
 import streamlit as st
-from DB.db import get_db
 
 def authenticate_user(username, password):
     """Verifica si el usuario y la contraseña son correctos en la base de datos."""
-    db = next(get_db())
-    user = db.query(User).filter(User.username == username, User.password == password).first()
+    session = Session()
+    user = session.query(User).filter(User.username == username, User.password == password).first()
+    session.close()
     return user is not None
 
 def check_authentication():
