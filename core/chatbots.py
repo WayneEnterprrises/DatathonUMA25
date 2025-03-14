@@ -9,6 +9,7 @@ from DB.dbInterface import *
 #IDEA si Claude.puede leer páginas web subir la información a una página para no consumir tokens
 def returnPatientSummary(idioma, selected_patient, userName):
     json_resumen_paciente = json_info_from_instance_class(selected_patient)
+    print(json_resumen_paciente)
     prompt = f"""Traduce la respuesta al idioma seleccionado: {idioma}.
     Solo da la respuesta en el idioma que te he pedido.
     Eres un médico profesional, quiero que respondas con un vocabulario técnico
@@ -24,7 +25,7 @@ def returnPatientSummary(idioma, selected_patient, userName):
             messages=[{"role": "user", "content": prompt}] ,
             stream=True  
         )
-
+        print(response)
         buffer = []
         for chunk in response:
             if hasattr(chunk, "choices") and chunk.choices:
@@ -33,7 +34,7 @@ def returnPatientSummary(idioma, selected_patient, userName):
 
                 # Control de latencia dinámico según la cantidad de chunks
                 if len(buffer) % 5 == 0:
-                    time.sleep(0.05)
+                    time.sleep(0.02)
                 
                 yield "".join(buffer)
                 buffer.clear()
@@ -46,8 +47,11 @@ def returnPatientSummary(idioma, selected_patient, userName):
 
 
 def process_chat_message(prompt, idioma, file_context, conver_history, selected_patient):
+
+    patient_json_info = json_info_from_instance_class(selected_patient)
+
     """Procesa el mensaje del usuario y genera respuesta del LLM, incluyendo los 6 CSVs automáticamente."""
-    
+
     if conver_history is None:
         conver_history = []
     # Convertir info paciente a JSON legible para Claude, información resumen o completa (puede variar dependiendo del prompt)
@@ -55,7 +59,7 @@ def process_chat_message(prompt, idioma, file_context, conver_history, selected_
     #patient_json_all_info =  all_patient_info(selected_patient.PatientID) (int)
     #Método all_patient_info()
     
-
+    print(conver_history)
     #En selected_patient tenemos una instancia del objeto ORM resumen pacientes del paciente seleccionado, una fila
     
     
@@ -82,7 +86,7 @@ def process_chat_message(prompt, idioma, file_context, conver_history, selected_
 
     # Convertir historial a JSON estructurado
     history_messages = [{"role": "user", "content": msg["content"]} for msg in conver_history]
-    """
+    
     try:
         response = client.chat.completions.create(
             model="bedrock/anthropic.claude-3-5-sonnet-20240620-v1:0",
@@ -98,7 +102,7 @@ def process_chat_message(prompt, idioma, file_context, conver_history, selected_
 
                 # Control de latencia dinámico según la cantidad de chunks
                 if len(buffer) % 5 == 0:
-                    time.sleep(0.05)
+                    time.sleep(0.02)
                 
                 yield "".join(buffer)
                 buffer.clear()
@@ -106,4 +110,3 @@ def process_chat_message(prompt, idioma, file_context, conver_history, selected_
     except Exception as e:
         print(f"Error en la API: {e}")
         return "Lo sentimos, nuestro LLM no está disponible en este momento, por favor inténtelo más tarde."
-    """
