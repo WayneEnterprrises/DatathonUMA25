@@ -1,4 +1,4 @@
-from DB.db import User, Session
+from DB.dbInterface import User, Session
 import streamlit as st
 
 def authenticate_user(username, password):

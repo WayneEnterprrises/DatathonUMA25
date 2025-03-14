@@ -2,7 +2,7 @@ import streamlit as st
 from core.image_processing import process_image
 from core.chatbots import process_chat_message
 from security.auth import check_authentication
-from DB.db import get_all_patients, load_chat_history, save_chat_message
+from DB.dbInterface import get_all_patients, load_chat_history, save_chat_message
 import time
 
 st.set_page_config(page_title="Welcome to Bruce!!", page_icon=":bat:")
@@ -17,8 +17,11 @@ st.title("Presentamos a Bruce!!")
 # 📌 Seleccionar Paciente o Agregar Nuevo
 st.markdown("### Selecciona un paciente")
 
+
+#Este método devuelve los objetos ORM de los pacientes
 patients = get_all_patients()
 patient_names = [p.Nombre for p in patients]
+
 
 selected_patient_name = st.selectbox(label="Selecciona un paciente", label_visibility="hidden", options=patient_names, index=None, placeholder="Selecciona un paciente disponible")
 
@@ -63,7 +66,7 @@ if selected_patient_name != None:
             st.markdown(prompt)
 
         st.session_state["chat_history"].append({"role": "user", "content": prompt})
-        print(st.session_state.chat_history)
+        #print(st.session_state.chat_history)
         file_context = ""
         if archivos:
             with st.spinner('🔍 Analizando archivos...'):

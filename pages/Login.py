@@ -1,7 +1,7 @@
 import streamlit as st
 import time
 from security.auth import authenticate_user
-from DB.db import register_user
+from DB.dbInterface import register_user
 
 def login_form():
     if "authenticated" not in st.session_state:

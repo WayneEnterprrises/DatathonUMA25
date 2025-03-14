@@ -1,7 +1,8 @@
 from .config import client
 import time
 import json
-from DB.db import json_info_from_instance_class
+
+from DB.dbInterface import *
 
 def process_chat_message(prompt, idioma, file_context, conver_history, selected_patient):
     """Procesa el mensaje del usuario y genera respuesta del LLM, incluyendo los 6 CSVs automáticamente."""
@@ -10,8 +11,12 @@ def process_chat_message(prompt, idioma, file_context, conver_history, selected_
         conver_history = []
     # Convertir info paciente a JSON legible para Claude
     patient_json_info = json_info_from_instance_class(selected_patient)
-    # Limitar la cantidad de mensajes en la memoria
 
+    #En selected_patient tenemos una instancia del objeto ORM resumen pacientes del paciente seleccionado, una fila
+    
+    #La idea sería poder mandarle a claude toda la información de los pacientes
+    # Limitar la cantidad de mensajes en la memoria
+    
     preprompt = f"""Traduce la respuesta al idioma seleccionado: {idioma}.
     Solo da la respuesta en el idioma que te he pedido.
     Eres un médico profesional, quiero que respondas con un vocabulario técnico
@@ -34,7 +39,7 @@ def process_chat_message(prompt, idioma, file_context, conver_history, selected_
 
     # Convertir historial a JSON estructurado
     history_messages = [{"role": "user", "content": msg["content"]} for msg in conver_history]
-
+    """
     try:
         response = client.chat.completions.create(
             model="bedrock/anthropic.claude-3-5-sonnet-20240620-v1:0",
@@ -58,3 +63,4 @@ def process_chat_message(prompt, idioma, file_context, conver_history, selected_
     except Exception as e:
         print(f"Error en la API: {e}")
         return "Lo sentimos, nuestro LLM no está disponible en este momento, por favor inténtelo más tarde."
+    """
