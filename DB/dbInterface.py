@@ -20,7 +20,6 @@ Base.prepare(autoload_with=engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-
  
 Notas = Base.classes.resumen_notas
 Evolucion = Base.classes.resumen_evolucion
@@ -99,8 +98,9 @@ def get_patient(patient_id):
 def get_all_patients():
     """Devuelve todos los pacientes del médico que esta autenticado actualmente."""
     session = Session()
-    user = get_user_by_username(st.session_state["username"])
-    patients = session.query(Pacientes).filter(Pacientes.Medico == user.ID).all()
+    #user = get_user_by_username(st.session_state["username"])
+    #patients = session.query(Pacientes).filter(Pacientes.Medico == user.ID).all()
+    patients = session.query(Pacientes).all()
     session.close()
     return patients
 
@@ -109,6 +109,7 @@ def save_chat_message(patient_id, role, message):
     session = Session()
     new_message = Chat(patient_id=patient_id, role=role, message=message)
     session.add(new_message)
+    session.commit()
     session.close()
 
 def register_user(username, password):
@@ -118,6 +119,7 @@ def register_user(username, password):
         return False  # Usuario ya existe
     new_user = User(username=username, password=password)
     session.add(new_user)
+    session.commit()
     session.close()
     return True
 
