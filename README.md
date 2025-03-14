@@ -19,7 +19,7 @@ $ pip install streamlit transformers pillow torch openai
 4. Ejecutamos el comando para desplegar la aplicación en local de la siguinte forma:
 
 ```bash
-$ python3 -m streamlit run ./Sobre_Nosotros.py
+$ python3 -m streamlit run ./app.py
 ```
 
 ## To-do list
@@ -27,4 +27,4 @@ $ python3 -m streamlit run ./Sobre_Nosotros.py
 - [ ] Arreglar fallos simples de flujo de ejecución (MVC model)
 - [ ] Iniciar desarrollo de pipelines entre LLMs
 - [ ] Investigar sobre generación de gráficas y contenido no textual para mayor riqueza en las respuestas
-- [ ] Base de datos con los chats (usuarios y autenticación ???)
+- [x] Base de datos con los chats (usuarios y autenticación)

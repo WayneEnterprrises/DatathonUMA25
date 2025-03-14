@@ -66,7 +66,6 @@ def login_form():
                 st.error("Usuario o contraseña incorrectos.")
             time.sleep(2)
             st.rerun()
-            st.navigation("pages/Sobre_Nosotros.py")
 
     elif st.session_state["login_mode"] == "register":
         st.subheader("📝 Registrarse")
