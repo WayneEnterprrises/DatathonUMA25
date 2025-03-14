@@ -43,11 +43,11 @@ def json_info_from_instance_class(instance_class):
     
     class_dict = instance_to_dict(instance_class)
     
-    json_object = json.dumps(class_dict, indent=2)
+    json_object = json.dumps(class_dict, indent=2, ensure_ascii=False)
     
     return json_object
 
-def all_patient_info_join(patient_id):
+def all_patient_info(patient_id):
     
     statement_Pacientes = select(Pacientes).where(Pacientes.PacienteID == patient_id)
     statement_Notas = select(Notas).where(Notas.PacienteID == patient_id)
@@ -79,7 +79,7 @@ def all_patient_info_join(patient_id):
     
     
     
-    
+
         
 
 
