@@ -1,6 +1,6 @@
 import streamlit as st
 from core.image_processing import process_image
-from core.chatbots import process_chat_message,returnPatientSummary
+from core.chatbots import process_chat_message, returnPatientSummary
 from security.auth import check_authentication
 from DB.dbInterface import get_all_patients, load_chat_history, save_chat_message
 import time
@@ -14,19 +14,20 @@ username = st.session_state["username"]
 
 st.title("Presentamos a Bruce!!")
 
-# 📌 Seleccionar Paciente o Agregar Nuevo
+# 📌 Seleccionar Paciente
 st.markdown("### Selecciona un paciente")
-
-
-#Este método devuelve los objetos ORM de los pacientes
 patients = get_all_patients()
 patient_names = [p.Nombre for p in patients]
 
+selected_patient_name = st.selectbox(
+    label="Selecciona un paciente",
+    label_visibility="hidden",
+    options=patient_names,
+    index=None,
+    placeholder="Selecciona un paciente disponible"
+)
 
-selected_patient_name = st.selectbox(label="Selecciona un paciente", label_visibility="hidden", options=patient_names, index=None, placeholder="Selecciona un paciente disponible")
-
-if selected_patient_name != None:
-
+if selected_patient_name:
     # 📌 Selector de idioma
     idioma = st.selectbox("Selecciona el idioma", ["Español", "Inglés", "Francés"])
 
@@ -38,50 +39,42 @@ if selected_patient_name != None:
 
     selected_patient = next(p for p in patients if p.Nombre == selected_patient_name)
 
-    welcome_message = returnPatientSummary(idioma, selected_patient, username)
-    welcome_container = st.empty()
-    full_welcome = ""
-    for chunk in welcome_message:
-        full_welcome += chunk
-        welcome_container.markdown(full_welcome + "▌")
-        time.sleep(0.3)
+    # 📌 Cargar historial de conversación si el paciente cambia
+    if "selected_patient_id" not in st.session_state or st.session_state["selected_patient_id"] != selected_patient.PacienteID:
+        chat_entry = load_chat_history(selected_patient.PacienteID)
+        st.session_state["chat_history"] = [{"role": entry.role, "content": entry.message} for entry in chat_entry]
+        st.session_state["selected_patient_id"] = selected_patient.PacienteID  # ✅ Guardamos el paciente actual
 
-    welcome_container.markdown(full_welcome)
-    
-
-    # 📌 Evitar duplicación del historial
-    if "selected_patient" not in st.session_state or st.session_state["selected_patient"] != selected_patient.PacienteID:
-        st.session_state["chat_history"] = []  # Resetear historial antes de cargar nuevos mensajes
-        chat_history = load_chat_history(selected_patient.PacienteID)
-            
-        # Evitar agregar mensajes repetidos
-        unique_messages = set()
-        for chat in chat_history:
-            msg_tuple = (chat.role, chat.message)  # Convertir en tupla para evitar duplicados
-            if msg_tuple not in unique_messages:
-                st.session_state["chat_history"].append({"role": chat.role, "content": chat.message})
-                unique_messages.add(msg_tuple)
-            
-        st.session_state["selected_patient"] = selected_patient.PacienteID
-    
-    # 📌 Mostrar el historial de conversación
-    st.markdown("### Preguntale a Bruce lo que necesites saber")
-    for mensaje in st.session_state.chat_history:
-        with st.chat_message(mensaje["role"]):
-            st.markdown(mensaje["content"])
+    # 📌 Mostrar el historial como un chat real
+    for message in st.session_state["chat_history"]:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
     # 📌 Entrada del usuario
     prompt = st.chat_input("Pregunta a Bruce sobre algo que necesites saber de tus pacientes")
 
+    # ✅ Si el historial está vacío, mostrar un mensaje de bienvenida
+    if not st.session_state["chat_history"]:
+        with st.chat_message("assistant"):
+            welcome_message = returnPatientSummary(idioma, selected_patient, username)
+            welcome_container = st.empty()
+            full_welcome = ""
+            for chunk in welcome_message:
+                full_welcome += chunk
+                welcome_container.markdown(full_welcome + "▌")
+                time.sleep(0.02)
+
+            welcome_container.markdown(full_welcome)
+            save_chat_message(selected_patient.PacienteID, "assistant", full_welcome)
+            st.session_state["chat_history"].append({"role": "assistant", "content": full_welcome})
 
     if prompt:
-        save_chat_message(selected_patient.PacienteID, "user", prompt)
-
         with st.chat_message("user"):
             st.markdown(prompt)
 
+        # ✅ Agregar el nuevo mensaje correctamente
         st.session_state["chat_history"].append({"role": "user", "content": prompt})
-        #print(st.session_state.chat_history)
+
         file_context = ""
         if archivos:
             with st.spinner('🔍 Analizando archivos...'):
@@ -90,34 +83,21 @@ if selected_patient_name != None:
         with st.chat_message("assistant"):
             response_container = st.empty()
 
-            #Si selecicionamos que queremos recordar el chat, le pasaremos a la ia la sesion, de lo contrario no enviaremos nada
-            if historial_chat:
-                # 📌 Pasar el historial del chat como contexto al modelo
-                response_stream = process_chat_message(prompt,idioma, file_context, st.session_state.chat_history, selected_patient)
-            else:
-                response_stream = process_chat_message(prompt,idioma, file_context, None, selected_patient)
-            
-            if response_stream is not None:
+            # ✅ Enviar historial si el usuario seleccionó la opción
+            history_context = st.session_state["chat_history"] if historial_chat else None
+
+            response_stream = process_chat_message(prompt, idioma, file_context, history_context, selected_patient)
+
+            if response_stream:
                 full_response = ""
-                # 🔄 Desparticionar el mensaje y mostrarlo en tiempo real
                 for chunk in response_stream:
                     full_response += chunk
                     response_container.markdown(full_response + "▌")
                     time.sleep(0.05)
 
                 response_container.markdown(full_response)
-
-                save_chat_message(selected_patient.PacienteID, "assistant", full_response)
-
                 st.session_state["chat_history"].append({"role": "assistant", "content": full_response})
+
             else:
-                response_stream = "Nuestro LLM no se encuentra disponible en estos momentos, lamentamos los inconvenientes"
-                full_response = ""
-                for chunk in response_stream:
-                    full_response += chunk
-                    response_container.markdown(full_response + "▌")
-                    time.sleep(0.6)
-
-                response_container.markdown(full_response)
-
-                st.session_state["chat_history"].append({"role": "assistant", "content": full_response})
+                response_container.markdown("Nuestro LLM no se encuentra disponible en estos momentos, lamentamos los inconvenientes.")
+                st.session_state["chat_history"].append({"role": "assistant", "content": "Nuestro LLM no se encuentra disponible en estos momentos."})
