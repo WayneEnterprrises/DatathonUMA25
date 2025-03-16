@@ -9,14 +9,12 @@ from DB.dbInterface import *
 #IDEA si Claude.puede leer páginas web subir la información a una página para no consumir tokens
 def returnPatientSummary(idioma, selected_patient, userName):
     json_resumen_paciente = json_info_from_instance_class(selected_patient)
-    print(json_resumen_paciente)
     prompt = f"""Traduce la respuesta al idioma seleccionado: {idioma}.
     Solo da la respuesta en el idioma que te he pedido.
     Eres un médico profesional, quiero que respondas con un vocabulario técnico
     y añadas información relevante a la consulta, añade enlaces de interes sobre las enfermedades que se traten en la conversacion.
     
-    Debes saludar al Dr.{userName} y hacer un resumen con la información del paciente {json_resumen_paciente}. Utiliza https://pubmed.ncbi.nlm.nih.gov/, para aumentar
-    la información sobre este y hacer recomendaciones.
+    Debes saludar al Dr.{userName} y hacer un resumen con la información del paciente {json_resumen_paciente}.
     Termina la respuesta pidiedo al Dr. Más instrucciones para continuar
     """
     try:
@@ -25,7 +23,6 @@ def returnPatientSummary(idioma, selected_patient, userName):
             messages=[{"role": "user", "content": prompt}] ,
             stream=True  
         )
-        print(response)
         buffer = []
         for chunk in response:
             if hasattr(chunk, "choices") and chunk.choices:
@@ -58,11 +55,6 @@ def process_chat_message(prompt, idioma, file_context, conver_history, selected_
     #patient_json_info = json_info_from_instance_class(selected_patient)
     #patient_json_all_info =  all_patient_info(selected_patient.PatientID) (int)
     #Método all_patient_info()
-    
-    print(conver_history)
-    #En selected_patient tenemos una instancia del objeto ORM resumen pacientes del paciente seleccionado, una fila
-    
-    
     
     preprompt = f"""Traduce la respuesta al idioma seleccionado: {idioma}.
     Solo da la respuesta en el idioma que te he pedido.
