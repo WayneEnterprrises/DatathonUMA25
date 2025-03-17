@@ -1,10 +1,92 @@
 from .config import client, client_PEDRO
 import time
 import json
-
+import plotly.express as px
 from DB.dbInterface import *
 from openai import OpenAI
 
+
+# Función para analizar si el prompt del usuario requiere estadísticas
+# Se consulta a Claude para determinar si la pregunta necesita gráficos o tablas
+def analyze_prompt_for_statistics(prompt):
+    """
+    Usa Claude para analizar si el prompt necesita generación de estadísticas.
+    """
+    analysis_prompt = f"""
+    Analiza la siguiente consulta y responde con 'SI' si requiere datos estadísticos, 
+    como gráficos, tablas o estadísticas generales. Si no se necesitan estadísticas, responde 'NO'.
+    Recuerda que cualquier dato que sea un porcentaje o que pueda traducirse a un porcentaje se considera estadistico.
+    **IMPORTANTE**
+    Responde unicamente con SI o NO nada mas.
+    Consulta: {prompt}
+    """
+    
+    try:
+        response = client.chat.completions.create(
+            model="bedrock/anthropic.claude-3-5-sonnet-20240620-v1:0",
+            messages=[{"role": "user", "content": analysis_prompt}]
+        )
+        analysis_result = response.choices[0].message.content.strip()
+        print(analysis_result)
+        return analysis_result.upper() == "SI"
+    except Exception as e:
+        print(f"Error en el análisis del prompt: {e}")
+        return False
+
+# Función para generar datos estadísticos con base en la consulta del usuario
+# Si Claude detecta que se requieren estadísticas, esta función genera datos estructurados en JSON
+def generate_statistics_data(prompt):
+    """
+    Usa Claude para generar datos estadísticos con base en la pregunta del usuario.
+    """
+    stats_prompt = f"""
+    Genera datos estadísticos relevantes en formato JSON para responder la siguiente consulta, quiero que busques 
+    informacion real sobre los datos estadisticos exactos que vas a generar.
+    {prompt}
+    
+    Devuelve una lista de datos numéricos estructurados de la siguiente forma:
+    {{ "categorias": ["Categoria1", "Categoria2"], "valores": [10, 20] }}
+    Asegúrate de devolver solo un JSON válido sin explicaciones adicionales.
+    """
+    
+    try:
+        response = client.chat.completions.create(
+            model="bedrock/anthropic.claude-3-5-sonnet-20240620-v1:0",
+            messages=[{"role": "user", "content": stats_prompt}]
+        )
+        
+        stats_text = response.choices[0].message.content.strip()
+        print("Respuesta de Claude para estadísticas:", stats_text)  # Debugging
+        
+        if not stats_text:
+            raise ValueError("Claude no devolvió una respuesta válida para las estadísticas.")
+        
+        stats_data = json.loads(stats_text)
+        return stats_data
+    except json.JSONDecodeError as e:
+        print(f"Error al decodificar JSON: {e}")
+        return None
+    except Exception as e:
+        print(f"Error en la generación de estadísticas: {e}")
+        return None
+
+
+    
+# Función para generar un gráfico interactivo con Plotly a partir de los datos obtenidos
+def plot_statistics(stats_data):
+    """
+    Genera un gráfico interactivo con Plotly basado en los datos obtenidos.
+    """
+    if not stats_data or "categorias" not in stats_data or "valores" not in stats_data:
+        return None
+    
+    fig = px.bar(x=stats_data["categorias"], y=stats_data["valores"],
+                 labels={'x': 'Categorías', 'y': 'Valores'},
+                 title="Datos Estadísticos Generados",
+                 color=stats_data["valores"],
+                 color_continuous_scale="viridis")
+    
+    return fig
 def añadirEnlances_ChatGPT(promptInput):
 
     prompt = f"""Eres un agente especializado en proveer artículos de pubMed (https://pubmed.ncbi.nlm.nih.gov/). Tu función es proveer enlaces
@@ -16,10 +98,15 @@ def añadirEnlances_ChatGPT(promptInput):
         messages=[
             {
             "role": "assistant",
-            "content": prompt
+            "content": prompt,
             }
         ]
     )   
+    response_text = completion.choices[0].message.content if completion.choices else "No se encontraron enlaces relevantes."
+    #print(response_text)
+    return response_text
+    
+
     #Este agente ya devuelve los enlaces sin errores a pubMed
     #Hace falta añadirlo a continuación de process_chat_message en el prompt
    
@@ -104,7 +191,6 @@ def process_chat_message(prompt, idioma, file_context, conver_history, selected_
             messages=[{"role": "user", "content": preprompt}] + history_messages,
             stream=True  
         )
-
         buffer = []
         for chunk in response:
             if hasattr(chunk, "choices") and chunk.choices:
@@ -121,3 +207,4 @@ def process_chat_message(prompt, idioma, file_context, conver_history, selected_
     except Exception as e:
         print(f"Error en la API: {e}")
         return "Lo sentimos, nuestro LLM no está disponible en este momento, por favor inténtelo más tarde."
+    
