@@ -12,7 +12,7 @@ def returnPatientSummary(idioma, selected_patient, userName):
     prompt = f"""Traduce la respuesta al idioma seleccionado: {idioma}.
     Solo da la respuesta en el idioma que te he pedido.
     Eres un médico profesional, quiero que respondas con un vocabulario técnico
-    y añadas información relevante a la consulta, añade enlaces de interes sobre las enfermedades que se traten en la conversacion.
+    y añadas información relevante a la consulta.
     
     Debes saludar al Dr.{userName} y hacer un resumen con la información del paciente {json_resumen_paciente}.
     Termina la respuesta pidiedo al Dr. Más instrucciones para continuar
@@ -45,7 +45,7 @@ def returnPatientSummary(idioma, selected_patient, userName):
 
 def process_chat_message(prompt, idioma, file_context, conver_history, selected_patient):
 
-    patient_json_info = json_info_from_instance_class(selected_patient)
+    patient_json_info = all_patient_info(selected_patient)
 
     """Procesa el mensaje del usuario y genera respuesta del LLM, incluyendo los 6 CSVs automáticamente."""
 

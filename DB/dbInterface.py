@@ -70,11 +70,11 @@ def all_patient_info(patient_id):
     } 
     json_object = json.dumps(listaDiccionarios, indent=2, ensure_ascii=False) #indent mete un indent en el json para que sea legible y ensure_ascii hace que no se codifiquen mal las tildes
     
-    print(json_object)
+    #print(json_object)
         #Añadirlos todos a un json
     
     #Ejecutamos todos los statements, añadiendo el resultado a un diccionario
-    
+    return json_object
     
     
     
