@@ -1,9 +1,28 @@
-from .config import client
+from .config import client, client_PEDRO
 import time
 import json
 
 from DB.dbInterface import *
+from openai import OpenAI
 
+def añadirEnlances_ChatGPT(promptInput):
+
+    prompt = f"""Eres un agente especializado en proveer artículos de pubMed (https://pubmed.ncbi.nlm.nih.gov/). Tu función es proveer enlaces
+    relevantes a artículos para este texto generado por un asistente médico de un doctor: {promptInput}, 
+    """
+
+    completion = client_PEDRO.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {
+            "role": "assistant",
+            "content": prompt
+            }
+        ]
+    )   
+    #Este agente ya devuelve los enlaces sin errores a pubMed
+    #Hace falta añadirlo a continuación de process_chat_message en el prompt
+   
 
 #Este método debe llamarse al seleccionar un paciente, a modo introductorio, se le pasa la información resumen del paciente y un link de aumentación de datos.
 #IDEA si Claude.puede leer páginas web subir la información a una página para no consumir tokens
@@ -45,7 +64,7 @@ def returnPatientSummary(idioma, selected_patient, userName):
 
 def process_chat_message(prompt, idioma, file_context, conver_history, selected_patient):
 
-    patient_json_info = all_patient_info(selected_patient)
+    patient_json_info = all_patient_info(selected_patient.PacienteID)
 
     """Procesa el mensaje del usuario y genera respuesta del LLM, incluyendo los 6 CSVs automáticamente."""
 
@@ -59,7 +78,7 @@ def process_chat_message(prompt, idioma, file_context, conver_history, selected_
     preprompt = f"""Traduce la respuesta al idioma seleccionado: {idioma}.
     Solo da la respuesta en el idioma que te he pedido.
     Eres un médico profesional, quiero que respondas con un vocabulario técnico
-    y añadas información relevante a la consulta, añade enlaces de interes sobre las enfermedades que se traten en la conversacion.
+    y añadas información relevante a la consulta.
     
 
     📄 **Contexto de archivos adjuntos**:

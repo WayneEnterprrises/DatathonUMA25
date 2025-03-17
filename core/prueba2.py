@@ -5,10 +5,9 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 def añadirEnlances_ChatGPT(promptInput):
 
-    prompt = f"""Un agente LLM ha generado está respuesta: {promptInput}, 
-    añade enlaces de fuentes reputadas en formato https:// de interes sobre las enfermedades que se traten en la conversacion 
-    y NO MODIFIQUES EL CONTENIDO ORIGINAL verificando que las páginas siguen activas (no hay errores 404 o pone pageNotFound),
-    mandame solo lo que iría después del mensaje original"""
+    prompt = f"""Eres un agente especializado en proveer artículos de pubMed (https://pubmed.ncbi.nlm.nih.gov/). Tu función es proveer enlaces
+    relevantes a artículos para este texto generado por un asistente médico de un doctor: {promptInput}. 
+    """
 
     completion = client.chat.completions.create(
         model="gpt-4o",
@@ -20,12 +19,28 @@ def añadirEnlances_ChatGPT(promptInput):
         ]
     )
 
-    print(completion.choices[0].message.content)
+    return completion.choices[0].message.content
 
-añadirEnlances_ChatGPT("""Le saludo cordialmente y procedo a presentarle el resumen del caso clínico del paciente Juan Pérez:
+prompt = """ El paciente Juan Pérez recibió los siguientes medicamentos durante su hospitalización por neumonía adquirida en la comunidad, complicada por su EPOC preexistente:
 
-Varón de 68 años, ingresado en el Servicio de Neumología el 01/05/2023 por cuadro de fiebre elevada y tos productiva. El diagnóstico principal corresponde al código CIE-10 233604007. Como antecedentes relevantes, destaca enfermedad pulmonar obstructiva crónica (EPOC) asociada a tabaquismo crónico e hipertensión arterial. No se reportan alergias conocidas.
+Ceftriaxona: 2 g IV cada 24 horas Motivo: Antibiótico de amplio espectro para tratar la infección bacteriana causante de la neumonía. La ceftriaxona es eficaz contra muchos patógenos respiratorios comunes.
 
-Al ingreso, el paciente se encontraba hemodinámicamente estable, pero presentaba disnea de intensidad moderada. La sintomatología actual, sumada a sus condiciones preexistentes, sugiere un posible episodio de exacerbación de EPOC, aunque se requiere confirmación diagnóstica.
+Azitromicina: 500 mg VO cada 24 horas Motivo: Antibiótico macrólido que complementa la cobertura antibiótica, especialmente eficaz contra patógenos atípicos como Mycoplasma pneumoniae y Legionella. También posee efectos antiinflamatorios que pueden ser beneficiosos en pacientes con EPOC.
 
-Quedo a la espera de sus instrucciones para proceder con la evaluación adicional y el plan terapéutico más apropiado para este caso. ¿Desea que realicemos alguna prueba complementaria o que iniciemos algún tratamiento específico?""")
+Salbutamol: 5 mg nebulizado cada 6 horas Motivo: Broncodilatador de acción rápida para aliviar la broncoconstricción y mejorar la función respiratoria, especialmente importante en pacientes con EPOC y neumonía.
+
+Paracetamol: 1 g VO cada 8 horas Motivo: Analgésico y antipirético para controlar la fiebre y aliviar el malestar general asociado a la infección.
+
+Tiotropio: Inhalado (dosis no especificada) Motivo: Broncodilatador de acción prolongada indicado para el manejo a largo plazo de la EPOC. Se optimizó su uso al alta para mejorar el control de la enfermedad de base.
+
+La combinación de estos medicamentos está dirigida a:
+
+Tratar la infección respiratoria (antibióticos)
+Mejorar la función pulmonar (broncodilatadores)
+Controlar los síntomas (antipiréticos)
+Manejar la EPOC subyacente (broncodilatadores de mantenimiento)
+Es importante destacar que el manejo farmacológico se complementó con otras medidas terapéuticas como oxigenoterapia, fisioterapia respiratoria y movilización temprana."""
+
+
+
+print(añadirEnlances_ChatGPT(prompt))

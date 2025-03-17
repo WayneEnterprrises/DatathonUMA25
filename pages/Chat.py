@@ -1,6 +1,6 @@
 import streamlit as st
 from core.image_processing import process_image
-from core.chatbots import process_chat_message, returnPatientSummary
+from core.chatbots import process_chat_message, returnPatientSummary, añadirEnlances_ChatGPT
 from security.auth import check_authentication
 from DB.dbInterface import get_all_patients, load_chat_history, save_chat_message
 import time
@@ -83,6 +83,7 @@ if selected_patient_name:
             history_context = st.session_state["chat_history"]
 
             response_stream = process_chat_message(prompt, idioma, file_context, history_context, selected_patient)
+            
 
             if response_stream:
                 full_response = ""
@@ -93,6 +94,8 @@ if selected_patient_name:
 
                 response_container.markdown(full_response)
                 st.session_state["chat_history"].append({"role": "assistant", "content": full_response})
+            
+                
 
             else:
                 response_container.markdown("Nuestro LLM no se encuentra disponible en estos momentos, lamentamos los inconvenientes.")
