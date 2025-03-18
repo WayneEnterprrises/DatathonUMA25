@@ -79,9 +79,8 @@ if selected_patient_name:
         needs_statistics = analyze_prompt_for_statistics(prompt)
         print(needs_statistics)
         stats_image = None
-        if needs_statistics:
-            stats_data = generate_statistics_data(prompt)
-            stats_image = plot_statistics(stats_data)
+        if "stats_images" not in st.session_state:
+            st.session_state["stats_images"] = []
             
         with st.chat_message("assistant"):
             response_container = st.empty()
@@ -104,8 +103,14 @@ if selected_patient_name:
                 
                 response_container.markdown(full_response)
                 st.session_state["chat_history"].append({"role": "assistant", "content": full_response})
-                if stats_image:
-                    st.plotly_chart(stats_image, use_container_width=True)
+
+                if needs_statistics:
+                    with st.spinner("🚀Generando estadísticas..."):
+                        stats_data = generate_statistics_data(full_response)
+                        stats_image = plot_statistics(stats_data)
+                        if stats_image:
+                            st.plotly_chart(stats_image, use_container_width=True)
+                            st.session_state["stats_images"].append(stats_image)  # Agregar la nueva imagen a la lista
 
             else:
                 response_container.markdown("Nuestro LLM no se encuentra disponible en estos momentos, lamentamos los inconvenientes.")
