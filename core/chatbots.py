@@ -42,13 +42,15 @@ def generate_statistics_data(prompt):
     """
     Usa Claude para generar datos estadísticos con base en la pregunta del usuario.
     """
+    
+    
     stats_prompt = f"""
-    Genera datos estadísticos relevantes en formato JSON para responder la siguiente consulta, quiero que busques 
-    informacion real sobre los datos estadisticos exactos que vas a generar.
+     Devuelve una lista de datos numéricos estructurados de la siguiente forma:
+    {{ "categorias": ["Categoria1", "Categoria2"], "valores": [10, 20] }}
+    Asegúrate de devolver solo un JSON válido sin explicaciones adicionales.
+    Extrae la información para rellenar la lista de este texto:
     {prompt}
     
-    Devuelve una lista de datos numéricos estructurados de la siguiente forma:
-    {{ "categorias": ["Categoria1", "Categoria2"], "valores": [10, 20] }}
     Asegúrate de devolver solo un JSON válido sin explicaciones adicionales.
     """
     
@@ -72,6 +74,7 @@ def generate_statistics_data(prompt):
     except Exception as e:
         print(f"Error en la generación de estadísticas: {e}")
         return None
+    
 
 
     
@@ -261,7 +264,8 @@ def process_chat_message(prompt, idioma, file_context, conver_history, selected_
     
     preprompt = f"""Traduce la respuesta al idioma seleccionado: {idioma}.
     Solo da la respuesta en el idioma que te he pedido.
-    Eres un médico profesional ayudando al Dr. {userName}, quiero que respondas con un vocabulario técnico
+    Eres un médico profesional ayudando al Dr. {userName}, y eres parte de un sistema más grande en el que otro agente se
+    encargará de generar enlaces y otro de realizar las gráficas, así que si te solicitan dichas acciones no las realices, ni menciones nada al respecto. Quiero que respondas con un vocabulario técnico
     y añadas información relevante a la consulta.
     
 
@@ -273,7 +277,7 @@ def process_chat_message(prompt, idioma, file_context, conver_history, selected_
 
     Debes comprender la información proporcionada para poder responder correctamente a las preguntas
     que se te impone, puedes cumplimentar tus observaciones con tablas estadisticas sobre las enfermedades 
-    comentadas.
+    comentadas. 
 
     **Pregunta del usuario**:
     {prompt}

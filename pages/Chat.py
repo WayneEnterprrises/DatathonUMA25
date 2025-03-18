@@ -92,24 +92,27 @@ if selected_patient_name:
 
             if response_stream:
                 full_response = ""
+                full_response_without_links = ""
                 for chunk in response_stream:
                     full_response += chunk
+                    full_response_without_links += chunk
                     response_container.markdown(full_response + "▌")
                     time.sleep(0.05)
                 
                 #with st.spinner("🔍 Buscando enlaces de interés..."):
                  #   extra_info = añadirEnlances_ChatGPT(full_response)
                   #  full_response = full_response + extra_info if extra_info else full_response
+                
                 with st.spinner("🔍 Buscando información médica relevante..."):
                     extra_info = generar_info_adicional(full_response)
                     full_response += f"\n\n{extra_info}" if extra_info else ""
 
                 response_container.markdown(full_response)
                 st.session_state["chat_history"].append({"role": "assistant", "content": full_response})
-
+                print(full_response_without_links)
                 if needs_statistics:
                     with st.spinner("🚀Generando estadísticas..."):
-                        stats_data = generate_statistics_data(full_response)
+                        stats_data = generate_statistics_data(full_response_without_links)
                         stats_image = plot_statistics(stats_data)
                         if stats_image:
                             st.plotly_chart(stats_image, use_container_width=True)
