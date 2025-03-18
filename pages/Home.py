@@ -1,13 +1,13 @@
 import streamlit as st
 from pages.Login import login_form
 
-st.set_page_config(page_title="Sobre Nosotros", page_icon=":bat:", layout="centered")
+st.set_page_config(page_title="Home", page_icon=":bat:", layout="centered")
 
 if "authenticated" not in st.session_state or st.session_state.authenticated == False:
     login_form()
 else:
-    st.title("Presentación del Equipo")
-    st.write(f"Bienvenido {st.session_state['username']} al equipo ArkhamMed de la Universidad de Málaga")
+    st.markdown("<h2 style='text-align: center; font-weight: bold;'>🦇Bienvendido a ArkhamMed🦇</h2>", unsafe_allow_html=True)
+    st.write(f"La IA que la medicina merece y necesita, en ArhamMed, detectamos la enfermedad antes de que ataque.")
 
     st.image("assets/logoDatathon.png", caption="Arkham Analytics", use_container_width=True)
 

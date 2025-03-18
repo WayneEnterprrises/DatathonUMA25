@@ -12,10 +12,10 @@ check_authentication()
 
 username = st.session_state["username"]
 
-st.title("Presentamos a Bruce!!")
+st.title("🦇Bruce's LLM🦇")
 
 # 📌 Seleccionar Paciente
-st.markdown("### Selecciona un paciente")
+st.markdown("### Selecciona al paciente con el que quieras trabajar")
 patients = get_all_patients()
 patient_names = [p.Nombre for p in patients]
 
@@ -29,7 +29,7 @@ selected_patient_name = st.selectbox(
 
 if selected_patient_name:
     # 📌 Selector de idioma
-    idioma = st.selectbox("Selecciona el idioma", ["Español", "Inglés", "Francés"])
+    idioma = st.selectbox("Selecciona el idioma en el que quieras tu respuesta", ["Español", "Inglés", "Francés"])
 
     # 📂 Adjuntar archivos
     st.markdown("### Adjunta archivos a Bruce")
@@ -48,7 +48,7 @@ if selected_patient_name:
             st.markdown(message["content"])
     
     # 📌 Entrada del usuario
-    prompt = st.chat_input("Pregunta a Bruce sobre algo que necesites saber de tus pacientes")
+    prompt = st.chat_input("Pregunta a Bruce sobre algo que necesites saber de tu pacientes")
 
     # ✅ Si el historial está vacío, mostrar un mensaje de bienvenida
     if not st.session_state["chat_history"]:

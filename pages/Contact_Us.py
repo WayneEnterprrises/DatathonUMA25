@@ -4,10 +4,10 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from security.auth import check_authentication
 
-st.set_page_config(page_title="Contactanos", page_icon=":bat:")
+st.set_page_config(page_title="Contact Us", page_icon=":bat:")
 check_authentication()
 st.title("📩 Ayuda")
-st.write("Escríbenos para cualquier duda.")
+st.write("🦇Escríbenos sobre cualquier duda.🦇")
 
 email = st.text_input("Tu correo electrónico:", placeholder="ejemplo@email.com")
 
