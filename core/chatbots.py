@@ -1,3 +1,6 @@
+import re
+
+from pymed import PubMed
 from .config import client, client_PEDRO
 import time
 import json
@@ -87,29 +90,123 @@ def plot_statistics(stats_data):
                  color_continuous_scale="viridis")
     
     return fig
-def añadirEnlances_ChatGPT(promptInput):
 
-    prompt = f"""Eres un agente especializado en proveer artículos de pubMed (https://pubmed.ncbi.nlm.nih.gov/). Tu función es proveer enlaces
-    relevantes a artículos para este texto generado por un asistente médico de un doctor: {promptInput}, 
-    """
+#def añadirEnlances_ChatGPT(promptInput):
 
-    completion = client_PEDRO.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {
-            "role": "assistant",
-            "content": prompt,
-            }
-        ]
-    )   
-    response_text = completion.choices[0].message.content if completion.choices else "No se encontraron enlaces relevantes."
+ #   prompt = f"""Eres un agente especializado en proveer artículos de pubMed (https://pubmed.ncbi.nlm.nih.gov/). Tu función es proveer enlaces
+  #  relevantes a artículos para este texto generado por un asistente médico de un doctor: {promptInput}, 
+   # """
+
+    #completion = client_PEDRO.chat.completions.create(
+       # model="gpt-4o",
+       # messages=[
+       #     {
+     ##       "role": "assistant",
+     #       "content": prompt,
+    #        }
+  #      ]
+#    )   
+   # response_text = completion.choices[0].message.content if completion.choices else "No se encontraron enlaces relevantes."
     #print(response_text)
-    return response_text
+   # return response_text
     
 
     #Este agente ya devuelve los enlaces sin errores a pubMed
     #Hace falta añadirlo a continuación de process_chat_message en el prompt
+# ✅ Función combinada para generar y limpiar palabras clave
+# 📌 Función para generar y limpiar palabras clave
+def generar_y_limpiar_palabras_clave(promptInput):
+    """
+    Genera palabras clave médicas en base al prompt de entrada y limpia la salida
+    para asegurar que sea un JSON válido.
+    """
+    prompt = f"""Eres un agente especializado en generar palabras clave médicas relevantes 
+    para búsquedas en bases de datos como PubMed. 
+    Tu tarea es devolver únicamente palabras clave relevantes en formato JSON para el siguiente texto , elige solo las 5 palabras clave más relevantes y devuelvelas en INGLÉS:
+    
+    {promptInput}
+    
+    **Formato de respuesta JSON esperado:** 
+    {{
+      "palabras_clave": ["término1", "término2", "término3"]
+    }}
+    
+    No devuelvas explicaciones, solo el JSON válido.
+    """
+
+    try:
+        completion = client_PEDRO.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        response_text = completion.choices[0].message.content.strip()
+        return limpiar_json(response_text)  # Llamamos a limpiar_json antes de cargar el JSON
+    except Exception as e:
+        print(f"Error en la API de generación de palabras clave: {e}")
+        return {"palabras_clave": []}
+
+# ✅ Función para limpiar JSON
+def limpiar_json(response_text):
+    """
+    Extrae solo el bloque JSON de un texto con posibles caracteres adicionales.
+    """
+    try:
+        match = re.search(r'\{.*\}', response_text, re.DOTALL)
+        if match:
+            json_text = match.group(0)
+            return json.loads(json_text)  # Intentar parsear JSON
+        else:
+            raise ValueError("No se encontró un JSON válido en la respuesta.")
+    except json.JSONDecodeError as e:
+        print(f"Error al decodificar JSON: {e}")
+        return {"palabras_clave": []}
+
+# ✅ Función para buscar en PubMed usando pyMed
+def obtener_info_pubmed(palabras_clave, max_results=10):
+    """
+    Realiza una consulta a PubMed usando pymed con las palabras clave y devuelve títulos y enlaces a artículos relevantes.
+    """
+    pubmed = PubMed(tool="MedicalAgent", email="thedrakeishere12@gmail.com")  # Configuración de pyMed
+    print(palabras_clave)
+    query = " OR ".join(palabras_clave)  # Construcción de la query combinando palabras clave con OR
+    results = pubmed.query(query, max_results=max_results)  # Ejecutar la consulta
+
+    resultados = []
+    for article in results:
+        title = article.title if article.title else "Título no disponible"
    
+    # 📌 Extraer solo el primer PubMed ID válido
+        pubmed_ids = article.pubmed_id.split(";") if article.pubmed_id else []
+        pubmed_ids = [id.strip() for id in pubmed_ids if id.strip().isdigit()]  # Filtrar solo IDs numéricos
+
+        if pubmed_ids:  # Verificar que haya al menos un ID válido
+            pubmed_id = pubmed_ids[0]  # Tomar solo el primer ID válido
+            url = f"https://pubmed.ncbi.nlm.nih.gov/{pubmed_id}"
+            resultados.append(f"- [{title}]({url})")
+
+    return resultados if resultados else ["No se encontraron artículos relevantes en PubMed."]
+
+# ✅ Función principal que integra el generador de palabras clave con la búsqueda en PubMed
+def generar_info_adicional(promptInput):
+    """
+    Genera palabras clave médicas en base al prompt de entrada y obtiene información relevante de PubMed.
+    """
+    palabras_clave = generar_y_limpiar_palabras_clave(promptInput)  # Obtener palabras clave
+    if not palabras_clave["palabras_clave"]:
+        return "No se encontraron términos relevantes."
+
+    # Usar palabras clave para obtener datos de PubMed
+    info_pubmed = obtener_info_pubmed(palabras_clave["palabras_clave"])
+
+    # Construcción del texto final basado en la información obtenida
+    texto_info = "**📚 Información relevante encontrada:**\n\n"
+
+    if info_pubmed:
+        texto_info += "🔎 **PubMed:**\n" + "\n".join(info_pubmed) + "\n\n"
+
+    return texto_info if info_pubmed else "No se encontró información relevante en PubMed."
+
 
 #Este método debe llamarse al seleccionar un paciente, a modo introductorio, se le pasa la información resumen del paciente y un link de aumentación de datos.
 #IDEA si Claude.puede leer páginas web subir la información a una página para no consumir tokens
@@ -149,7 +246,7 @@ def returnPatientSummary(idioma, selected_patient, userName):
     
 
 
-def process_chat_message(prompt, idioma, file_context, conver_history, selected_patient):
+def process_chat_message(prompt, idioma, file_context, conver_history, selected_patient, userName):
 
     patient_json_info = all_patient_info(selected_patient.PacienteID)
 
@@ -164,7 +261,7 @@ def process_chat_message(prompt, idioma, file_context, conver_history, selected_
     
     preprompt = f"""Traduce la respuesta al idioma seleccionado: {idioma}.
     Solo da la respuesta en el idioma que te he pedido.
-    Eres un médico profesional, quiero que respondas con un vocabulario técnico
+    Eres un médico profesional ayudando al Dr. {userName}, quiero que respondas con un vocabulario técnico
     y añadas información relevante a la consulta.
     
 

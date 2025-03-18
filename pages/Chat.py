@@ -1,6 +1,6 @@
 import streamlit as st
 from core.image_processing import process_image
-from core.chatbots import process_chat_message, returnPatientSummary, añadirEnlances_ChatGPT,analyze_prompt_for_statistics,generate_statistics_data,plot_statistics
+from core.chatbots import process_chat_message, generar_info_adicional, returnPatientSummary,analyze_prompt_for_statistics,generate_statistics_data,plot_statistics
 from security.auth import check_authentication
 from DB.dbInterface import get_all_patients, load_chat_history, save_chat_message
 import time
@@ -88,7 +88,7 @@ if selected_patient_name:
             #Cargar el historial de toda la conversación actual
             history_context = st.session_state["chat_history"]
 
-            response_stream = process_chat_message(prompt, idioma, file_context, history_context, selected_patient)
+            response_stream = process_chat_message(prompt, idioma, file_context, history_context, selected_patient, username)
 
             if response_stream:
                 full_response = ""
@@ -97,10 +97,13 @@ if selected_patient_name:
                     response_container.markdown(full_response + "▌")
                     time.sleep(0.05)
                 
-                with st.spinner("🔍 Buscando enlaces de interés..."):
-                    extra_info = añadirEnlances_ChatGPT(full_response)
-                    full_response = full_response + extra_info if extra_info else full_response
-                
+                #with st.spinner("🔍 Buscando enlaces de interés..."):
+                 #   extra_info = añadirEnlances_ChatGPT(full_response)
+                  #  full_response = full_response + extra_info if extra_info else full_response
+                with st.spinner("🔍 Buscando información médica relevante..."):
+                    extra_info = generar_info_adicional(full_response)
+                    full_response += f"\n\n{extra_info}" if extra_info else ""
+
                 response_container.markdown(full_response)
                 st.session_state["chat_history"].append({"role": "assistant", "content": full_response})
 
