@@ -1,5 +1,4 @@
 import openai
-from transformers import pipeline
 from openai import OpenAI
 
 
@@ -14,9 +13,6 @@ client_PEDRO = OpenAI(api_key=OPENAI_API_KEY_CHATGPT)
 
 client = openai.OpenAI(api_key=OPENAI_API_KEY_CLAUDE, base_url=OPENAI_BASE_URL_CLAUDE)
 
-
-
-vision_model = pipeline("image-to-text", model="Salesforce/blip-image-captioning-large")
 
 
 

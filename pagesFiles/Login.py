@@ -53,8 +53,8 @@ def login_form():
 
     if st.session_state["login_mode"] == "login":
         st.subheader("🔑 Iniciar sesión")
-        username = st.text_input("Usuario", key="login_user", value="",placeholder="Username")
-        password = st.text_input("Contraseña", type="password", key="login_pass", value="",placeholder="********")
+        username = st.text_input("Usuario", key="login_user", value="", placeholder="usuario")
+        password = st.text_input("Contraseña", type="password", key="login_pass", value="", placeholder="contraseña")
         login_button = st.button("Acceder")
 
         if login_button:
@@ -69,9 +69,9 @@ def login_form():
 
     elif st.session_state["login_mode"] == "register":
         st.subheader("📝 Registrarse")
-        new_username = st.text_input("Nuevo usuario", key="register_user",placeholder="Username")
-        new_password = st.text_input("Nueva contraseña", type="password", key="register_pass",placeholder="********")
-        repeat_new_password = st.text_input("Repite nueva contraseña", type="password", key="repeat_register_pass",placeholder="********")
+        new_username = st.text_input("Nuevo usuario", key="register_user", placeholder="nuevo usuario")
+        new_password = st.text_input("Nueva contraseña", type="password", key="register_pass", placeholder="nueva contraseña")
+        repeat_new_password = st.text_input("Repite nueva contraseña", type="password", key="repeat_register_pass", placeholder="repita la contraseña")
         register_button = st.button("Crear cuenta")
 
         if register_button:

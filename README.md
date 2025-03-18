@@ -13,7 +13,7 @@ $ source .myenv/bin/activate
 3. Instalamos las librerias necesarias con el siguiente comando:
 
 ```bash
-$ pip install streamlit transformers pillow torch openai
+$ pip install -r requirements.txt
 ```
 
 4. Ejecutamos el comando para desplegar la aplicación en local de la siguinte forma:
@@ -21,10 +21,3 @@ $ pip install streamlit transformers pillow torch openai
 ```bash
 $ python3 -m streamlit run ./app.py
 ```
-
-## To-do list
-
-- [ ] Arreglar fallos simples de flujo de ejecución (MVC model)
-- [ ] Iniciar desarrollo de pipelines entre LLMs
-- [ ] Investigar sobre generación de gráficas y contenido no textual para mayor riqueza en las respuestas
-- [x] Base de datos con los chats (usuarios y autenticación)

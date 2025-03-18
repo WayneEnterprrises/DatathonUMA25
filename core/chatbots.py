@@ -249,7 +249,7 @@ def returnPatientSummary(idioma, selected_patient, userName):
     
 
 
-def process_chat_message(prompt, idioma, file_context, conver_history, selected_patient, userName):
+def process_chat_message(prompt, idioma, conver_history, selected_patient, userName):
 
     patient_json_info = all_patient_info(selected_patient.PacienteID)
 
@@ -267,10 +267,6 @@ def process_chat_message(prompt, idioma, file_context, conver_history, selected_
     Eres un médico profesional ayudando al Dr. {userName}, y eres parte de un sistema más grande en el que otro agente se
     encargará de generar enlaces y otro de realizar las gráficas, así que si te solicitan dichas acciones no las realices, ni menciones nada al respecto. Quiero que respondas con un vocabulario técnico
     y añadas información relevante a la consulta.
-    
-
-    📄 **Contexto de archivos adjuntos**:
-    {file_context}
 
     📊 **Datos estructurados de la información clínica del paciente al ingresar en el centro de salud**:
     {patient_json_info}
