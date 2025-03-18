@@ -104,14 +104,6 @@ def get_all_patients():
     session.close()
     return patients
 
-def save_chat_message(patient_id, role, message):
-    """Guarda un mensaje en la base de datos asociado a un paciente."""
-    session = Session()
-    new_message = Chat(patient_id=patient_id, role=role, message=message)
-    session.add(new_message)
-    session.commit()
-    session.close()
-
 def register_user(username, password):
     """Registra un usuario en la base de datos SQLite."""
     session = Session()
@@ -122,10 +114,3 @@ def register_user(username, password):
     session.commit()
     session.close()
     return True
-
-def load_chat_history(patient_id):
-    """Carga el historial de chat de un paciente."""
-    session = Session()
-    chat = session.query(Chat).filter(Chat.patient_id == patient_id).all()
-    session.close()
-    return chat

@@ -1,8 +1,7 @@
 import streamlit as st
-from core.image_processing import process_image
 from core.chatbots import process_chat_message, generar_info_adicional, returnPatientSummary,analyze_prompt_for_statistics,generate_statistics_data,plot_statistics
 from security.auth import check_authentication
-from DB.dbInterface import get_all_patients, load_chat_history, save_chat_message
+from DB.dbInterface import get_all_patients
 import time
 
 st.set_page_config(page_title="Welcome to Bruce!!", page_icon=":bat:")
@@ -30,10 +29,6 @@ selected_patient_name = st.selectbox(
 if selected_patient_name:
     # 📌 Selector de idioma
     idioma = st.selectbox("Selecciona el idioma en el que quieras tu respuesta", ["Español", "Inglés", "Francés"])
-
-    # 📂 Adjuntar archivos
-    st.markdown("### Adjunta archivos a Bruce")
-    archivos = st.file_uploader("Seleccionar archivos para adjuntar", accept_multiple_files=True)
 
     selected_patient = next(p for p in patients if p.Nombre == selected_patient_name)
 
@@ -71,11 +66,6 @@ if selected_patient_name:
         # ✅ Agregar el nuevo mensaje correctamente
         st.session_state["chat_history"].append({"role": "user", "content": prompt})
 
-        file_context = ""
-        if archivos:
-            with st.spinner('🔍 Analizando archivos...'):
-                file_context = "\n".join([process_image(file) for file in archivos])
-        
         needs_statistics = analyze_prompt_for_statistics(prompt)
         print(needs_statistics)
         stats_image = None
@@ -88,7 +78,7 @@ if selected_patient_name:
             #Cargar el historial de toda la conversación actual
             history_context = st.session_state["chat_history"]
 
-            response_stream = process_chat_message(prompt, idioma, file_context, history_context, selected_patient, username)
+            response_stream = process_chat_message(prompt, idioma, history_context, selected_patient, username)
 
             if response_stream:
                 full_response = ""

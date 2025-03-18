@@ -1,5 +1,5 @@
 import streamlit as st
-from pages.Login import login_form
+from pagesFiles.Login import login_form
 
 st.set_page_config(page_title="Home", page_icon=":bat:", layout="centered")
 

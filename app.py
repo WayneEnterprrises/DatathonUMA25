@@ -1,9 +1,9 @@
 import streamlit as st
 
 pages = [
-    st.Page("pages/Home.py", title="Home"),
-    st.Page("pages/Chat.py", title="Chat"),
-    st.Page("pages/Contact_Us.py", title="Contact Us")
+    st.Page("pagesFiles/Home.py", title="Home"),
+    st.Page("pagesFiles/Chat.py", title="Chat"),
+    st.Page("pagesFiles/Contact_Us.py", title="Contact Us")
 ]
 
 pg = st.navigation(pages)
