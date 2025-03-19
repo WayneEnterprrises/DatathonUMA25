@@ -46,7 +46,7 @@ def generate_statistics_data(prompt):
     
     stats_prompt = f"""
      Devuelve una lista de datos numéricos estructurados de la siguiente forma:
-    {{ "categorias": ["Categoria1", "Categoria2"], "valores": [10, 20] }}
+    {{ "categorias": ["Categoria1(Unidad1)", "Categoria2(Unidad2)"], "valores": [10, 20] }}
     Asegúrate de devolver solo un JSON válido sin explicaciones adicionales.
     Extrae la información para rellenar la lista de este texto:
     {prompt}
@@ -264,8 +264,10 @@ def process_chat_message(prompt, idioma, conver_history, selected_patient, userN
     
     preprompt = f"""Traduce la respuesta al idioma seleccionado: {idioma}.
     Solo da la respuesta en el idioma que te he pedido.
-    Eres un médico profesional ayudando al Dr. {userName}, y eres parte de un sistema más grande en el que otro agente se
-    encargará de generar enlaces y otro de realizar las gráficas, así que si te solicitan dichas acciones no las realices, ni menciones nada al respecto. Quiero que respondas con un vocabulario técnico
+    Eres un asistente de médico profesional ayudando al Dr. {userName}, y eres parte de un sistema más grande en el que otro agente se
+    encargará de generar enlaces y otro de realizar las gráficas. No digas nada sobre que no puedes generar gráficas o enlaces estás serán añadidas por el otro agente.
+    
+    Quiero que respondas con un vocabulario técnico
     y añadas información relevante a la consulta.
 
     📊 **Datos estructurados de la información clínica del paciente al ingresar en el centro de salud**:

@@ -1,6 +1,6 @@
 import json
 import re
-from .chatbots import generar_info_adicional
+from .chatbots import generar_info_adicional, enriquecer_respuesta_con_pubmed
 from .config import client, client_PEDRO
 from pymed import PubMed
 import plotly as px
@@ -24,42 +24,6 @@ prompt  = """El paciente Carlos García recibió los siguientes medicamentos com
 
 Estos medicamentos forman parte del protocolo estándar para el manejo de la cetoacidosis diabética, abordando la hiperglucemia, la deshidratación, los desequilibrios electrolíticos y la acidosis metabólica características de esta condición."""
 
-def generate_statistics_data(prompt):
-    """
-    Usa Claude para generar datos estadísticos con base en la pregunta del usuario.
-    """
-    
-    
-    stats_prompt = f"""
-     Devuelve una lista de datos numéricos estructurados de la siguiente forma:
-    {{ "categorias": ["Categoria1", "Categoria2"], "valores": [10, 20] }}
-    Asegúrate de devolver solo un JSON válido sin explicaciones adicionales.
-    Extrae la información para rellenar la lista de este texto:
-    {prompt}
-    
-    Asegúrate de devolver solo un JSON válido sin explicaciones adicionales.
-    """
-    
-    try:
-        response = client.chat.completions.create(
-            model="bedrock/anthropic.claude-3-5-sonnet-20240620-v1:0",
-            messages=[{"role": "user", "content": stats_prompt}]
-        )
-        
-        stats_text = response.choices[0].message.content.strip()
-        print("Respuesta de Claude para estadísticas:", stats_text)  # Debugging
-        
-        if not stats_text:
-            raise ValueError("Claude no devolvió una respuesta válida para las estadísticas.")
-        
-        stats_data = json.loads(stats_text)
-        return stats_data
-    except json.JSONDecodeError as e:
-        print(f"Error al decodificar JSON: {e}")
-        return None
-    except Exception as e:
-        print(f"Error en la generación de estadísticas: {e}")
-        return None
+enlaces = generar_info_adicional(prompt)
 
-
-px.plot_statistics(generate_statistics_data(prompt))
+print(enriquecer_respuesta_con_pubmed(prompt, enlaces))
