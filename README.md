@@ -2,8 +2,6 @@
 
 > La IA que la medicina merece y necesita
 
----
-
 ## Instalación
 
 Esta aplicación se puede ejecutar desde una terminal actualmente a través de un IDE o en una terminal nativa de bash.
@@ -36,3 +34,7 @@ $ pip install -r requirements.txt
 ```bash
 $ python3 -m streamlit run ./app.py
 ```
+
+## Presentación
+
+![Enlace a la presentación en canva](https://www.canva.com/design/DAGiKRLITfw/TFLIXql0msxDvrfhftrYyQ/edit?utm_content=DAGiKRLITfw&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
