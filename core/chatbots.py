@@ -1,5 +1,4 @@
 import re
-
 from pymed import PubMed
 from .config import client, client_PEDRO
 import time
@@ -94,29 +93,7 @@ def plot_statistics(stats_data):
     
     return fig
 
-#def añadirEnlances_ChatGPT(promptInput):
 
- #   prompt = f"""Eres un agente especializado en proveer artículos de pubMed (https://pubmed.ncbi.nlm.nih.gov/). Tu función es proveer enlaces
-  #  relevantes a artículos para este texto generado por un asistente médico de un doctor: {promptInput}, 
-   # """
-
-    #completion = client_PEDRO.chat.completions.create(
-       # model="gpt-4o",
-       # messages=[
-       #     {
-     ##       "role": "assistant",
-     #       "content": prompt,
-    #        }
-  #      ]
-#    )   
-   # response_text = completion.choices[0].message.content if completion.choices else "No se encontraron enlaces relevantes."
-    #print(response_text)
-   # return response_text
-    
-
-    #Este agente ya devuelve los enlaces sin errores a pubMed
-    #Hace falta añadirlo a continuación de process_chat_message en el prompt
-# ✅ Función combinada para generar y limpiar palabras clave
 # 📌 Función para generar y limpiar palabras clave
 def generar_y_limpiar_palabras_clave(promptInput):
     """
@@ -212,7 +189,6 @@ def generar_info_adicional(promptInput):
 
 
 #Este método debe llamarse al seleccionar un paciente, a modo introductorio, se le pasa la información resumen del paciente y un link de aumentación de datos.
-#IDEA si Claude.puede leer páginas web subir la información a una página para no consumir tokens
 def returnPatientSummary(idioma, selected_patient, userName):
     json_resumen_paciente = json_info_from_instance_class(selected_patient)
     prompt = f"""Traduce la respuesta al idioma seleccionado: {idioma}.
@@ -251,16 +227,13 @@ def returnPatientSummary(idioma, selected_patient, userName):
 
 def process_chat_message(prompt, idioma, conver_history, selected_patient, userName):
 
+    # Convertir info paciente a JSON legible para Claude, información resumen o completa (puede variar dependiendo del prompt)
     patient_json_info = all_patient_info(selected_patient.PacienteID)
 
     """Procesa el mensaje del usuario y genera respuesta del LLM, incluyendo los 6 CSVs automáticamente."""
 
     if conver_history is None:
         conver_history = []
-    # Convertir info paciente a JSON legible para Claude, información resumen o completa (puede variar dependiendo del prompt)
-    #patient_json_info = json_info_from_instance_class(selected_patient)
-    #patient_json_all_info =  all_patient_info(selected_patient.PatientID) (int)
-    #Método all_patient_info()
     
     preprompt = f"""Traduce la respuesta al idioma seleccionado: {idioma}.
     Solo da la respuesta en el idioma que te he pedido.
